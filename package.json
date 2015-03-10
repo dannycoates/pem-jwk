@@ -1,0 +1,13 @@
+{
+  "name": "pem-jwk",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "node test/test.js"
+  },
+  "license": "MPL 2.0",
+  "dependencies": {
+    "asn1.js": "1.0.3",
+    "base64url": "1.0.4"
+  }
+}
