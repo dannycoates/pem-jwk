@@ -1,6 +1,6 @@
 {
   "name": "pem-jwk",
-  "version": "1.0.0",
+  "version": "1.1.1",
   "main": "index.js",
   "scripts": {
     "test": "node test/test.js"
@@ -9,5 +9,16 @@
   "dependencies": {
     "asn1.js": "1.0.3",
     "base64url": "1.0.4"
-  }
+  },
+  "directories": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dannycoates/pem-jwk.git"
+  },
+  "bugs": {
+    "url": "https://github.com/dannycoates/pem-jwk/issues"
+  },
+  "homepage": "https://github.com/dannycoates/pem-jwk"
 }

@@ -71,22 +71,33 @@ var PrivateKeyInfo = asn.define('PrivateKeyInfo', function () {
 
 const RSA_OID = '1.2.840.113549.1.1.1'
 
-function decodeRsaPublic(buffer) {
+function addExtras(obj, extras) {
+  extras = extras || {}
+  Object.keys(extras).forEach(
+    function (key) {
+      obj[key] = extras[key]
+    }
+  )
+  return obj
+}
+
+function decodeRsaPublic(buffer, extras) {
   var key = RSAPublicKey.decode(buffer, 'der')
   var e = key.e.toString(16)
   if (e.length % 2 === 1) { e = '0' + e }
-  return {
+  var jwk = {
     kty: 'RSA',
     n: bn2base64url(key.n),
     e: base64url(e, 'hex')
   }
+  return addExtras(jwk, extras)
 }
 
-function decodeRsaPrivate(buffer) {
+function decodeRsaPrivate(buffer, extras) {
   var key = RSAPrivateKey.decode(buffer, 'der')
   var e = key.e.toString(16)
   if (e.length % 2 === 1) { e = '0' + e }
-  return {
+  var jwk = {
     kty: 'RSA',
     n: bn2base64url(key.n),
     e: base64url(e, 'hex'),
@@ -97,16 +108,17 @@ function decodeRsaPrivate(buffer) {
     dq: bn2base64url(key.dq),
     qi: bn2base64url(key.qi)
   }
+  return addExtras(jwk, extras)
 }
 
-function decodePublic(buffer) {
+function decodePublic(buffer, extras) {
   var info = PublicKeyInfo.decode(buffer, 'der')
-  return decodeRsaPublic(info.publicKey.data, 'der')
+  return decodeRsaPublic(info.publicKey.data, extras)
 }
 
-function decodePrivate(buffer) {
+function decodePrivate(buffer, extras) {
   var info = PrivateKeyInfo.decode(buffer, 'der')
-  return decodeRsaPrivate(info.privateKey.data, 'der')
+  return decodeRsaPrivate(info.privateKey.data, extras)
 }
 
 function getDecoder(header) {
@@ -122,7 +134,7 @@ function getDecoder(header) {
   }
 }
 
-function pem2jwk(pem) {
+function pem2jwk(pem, extras) {
   var text = pem.toString().split(/(\r\n|\r|\n)+/g)
   text = text.filter(function(line) {
     return line.trim().length !== 0
@@ -130,7 +142,7 @@ function pem2jwk(pem) {
   var decoder = getDecoder(text[0])
 
   text = text.slice(1, -1).join('')
-  return decoder(new Buffer(text.replace(/[^\w\d\+\/=]+/g, ''), 'base64'))
+  return decoder(new Buffer(text.replace(/[^\w\d\+\/=]+/g, ''), 'base64'), extras)
 }
 
 function jwk2pem(jwk) {
