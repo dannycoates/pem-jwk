@@ -81,10 +81,13 @@ function addExtras(obj, extras) {
   return obj
 }
 
+function pad(hex) {
+  return (hex.length % 2 === 1) ? '0' + hex : hex
+}
+
 function decodeRsaPublic(buffer, extras) {
   var key = RSAPublicKey.decode(buffer, 'der')
-  var e = key.e.toString(16)
-  if (e.length % 2 === 1) { e = '0' + e }
+  var e = pad(key.e.toString(16))
   var jwk = {
     kty: 'RSA',
     n: bn2base64url(key.n),
@@ -95,8 +98,7 @@ function decodeRsaPublic(buffer, extras) {
 
 function decodeRsaPrivate(buffer, extras) {
   var key = RSAPrivateKey.decode(buffer, 'der')
-  var e = key.e.toString(16)
-  if (e.length % 2 === 1) { e = '0' + e }
+  var e = pad(key.e.toString(16))
   var jwk = {
     kty: 'RSA',
     n: bn2base64url(key.n),
@@ -171,7 +173,7 @@ function jwk2pem(jwk) {
 }
 
 function bn2base64url(bn) {
-  return base64url(bn.toString(16), 'hex')
+  return base64url(pad(bn.toString(16)), 'hex')
 }
 
 function base64url2bn(str) {
