@@ -155,18 +155,18 @@ function jwk2pem(jwk) {
   var data = isPrivate ?
     RSAPrivateKey.encode({
       version: 'two-prime',
-      n: base64url2bn(jwk.n),
-      e: base64url2bn(jwk.e),
-      d: base64url2bn(jwk.d),
-      p: base64url2bn(jwk.p),
-      q: base64url2bn(jwk.q),
-      dp: base64url2bn(jwk.dp),
-      dq: base64url2bn(jwk.dq),
-      qi: base64url2bn(jwk.qi)
+      n: string2bn(jwk.n),
+      e: string2bn(jwk.e),
+      d: string2bn(jwk.d),
+      p: string2bn(jwk.p),
+      q: string2bn(jwk.q),
+      dp: string2bn(jwk.dp),
+      dq: string2bn(jwk.dq),
+      qi: string2bn(jwk.qi)
     }, 'der') :
     RSAPublicKey.encode({
-      n: base64url2bn(jwk.n),
-      e: base64url2bn(jwk.e)
+      n: string2bn(jwk.n),
+      e: string2bn(jwk.e)
     }, 'der')
   var body = data.toString('base64').match(/.{1,64}/g).join('\n')
   return header + body + footer
@@ -178,6 +178,13 @@ function bn2base64url(bn) {
 
 function base64url2bn(str) {
   return new asn.bignum(base64url.toBuffer(str))
+}
+
+function string2bn(str) {
+  if (/^[0-9]+$/.test(str)) {
+    return new asn.bignum(str, 10)
+  }
+  return base64url2bn(str)
 }
 
 module.exports = {
