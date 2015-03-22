@@ -1,5 +1,7 @@
 var asn = require('asn1.js')
 var base64url = require('base64url')
+var factor = require('./factor')
+var one = new asn.bignum(1)
 
 function fromPEM(data) {
   var text = data.toString().split(/(\r\n|\r|\n)+/g);
@@ -147,27 +149,55 @@ function pem2jwk(pem, extras) {
   return decoder(new Buffer(text.replace(/[^\w\d\+\/=]+/g, ''), 'base64'), extras)
 }
 
-function jwk2pem(jwk) {
+function recomputePrimes(jwk) {
+  var pq = factor(jwk.e, jwk.d, jwk.n)
+  var p = pq.p
+  var q = pq.q
+  var dp = jwk.d.mod(p.sub(one))
+  var dq = jwk.d.mod(q.sub(one))
+  var qi = q.invm(p)
+  return {
+    n: jwk.n,
+    e: jwk.e,
+    d: jwk.d,
+    p: p,
+    q: q,
+    dp: dp,
+    dq: dq,
+    qi: qi
+  }
+}
+
+function parse(jwk) {
+  return {
+    n: string2bn(jwk.n),
+    e: string2bn(jwk.e),
+    d: jwk.d && string2bn(jwk.d),
+    p: jwk.p && string2bn(jwk.p),
+    q: jwk.q && string2bn(jwk.q),
+    dp: jwk.dp && string2bn(jwk.dp),
+    dq: jwk.dq && string2bn(jwk.dq),
+    qi: jwk.qi && string2bn(jwk.qi)
+  }
+}
+
+function jwk2pem(json) {
+  var jwk = parse(json)
   var isPrivate = !!(jwk.d)
   var t = isPrivate ? 'PRIVATE' : 'PUBLIC'
   var header = '-----BEGIN RSA ' + t + ' KEY-----\n'
   var footer = '\n-----END RSA ' + t + ' KEY-----\n'
-  var data = isPrivate ?
-    RSAPrivateKey.encode({
-      version: 'two-prime',
-      n: string2bn(jwk.n),
-      e: string2bn(jwk.e),
-      d: string2bn(jwk.d),
-      p: string2bn(jwk.p),
-      q: string2bn(jwk.q),
-      dp: string2bn(jwk.dp),
-      dq: string2bn(jwk.dq),
-      qi: string2bn(jwk.qi)
-    }, 'der') :
-    RSAPublicKey.encode({
-      n: string2bn(jwk.n),
-      e: string2bn(jwk.e)
-    }, 'der')
+  var data = Buffer(0)
+  if (isPrivate) {
+    if (!jwk.p) {
+      jwk = recomputePrimes(jwk)
+    }
+    jwk.version = 'two-prime'
+    data = RSAPrivateKey.encode(jwk, 'der')
+  }
+  else {
+    data = RSAPublicKey.encode(jwk, 'der')
+  }
   var body = data.toString('base64').match(/.{1,64}/g).join('\n')
   return header + body + footer
 }

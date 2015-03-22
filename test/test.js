@@ -25,5 +25,3 @@ var z = pj.pem2jwk(p3)
 var zp = pj.jwk2pem(z)
 //console.log(zp)
 assert.equal(p3, zp)
-
-console.log('ok')
