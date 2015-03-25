@@ -8,7 +8,7 @@ function convert(str) {
     console.log(pj.jwk2pem(JSON.parse(str)))
   }
   else {
-    console.log(pj.pem2jwk(str))
+    console.log(JSON.stringify(pj.pem2jwk(str)))
   }
 }
 
