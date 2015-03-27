@@ -1,7 +1,16 @@
 var asn = require('asn1.js')
-var base64url = require('base64url')
 var factor = require('./factor')
 var one = new asn.bignum(1)
+
+function urlize(base64) {
+  return base64.replace(/\+/g, '-')
+    .replace(/\//g, '_')
+    .replace(/=/g, '')
+}
+
+function hex2b64url(str) {
+  return urlize(Buffer(str, 'hex').toString('base64'))
+}
 
 function fromPEM(data) {
   var text = data.toString().split(/(\r\n|\r|\n)+/g);
@@ -93,7 +102,7 @@ function decodeRsaPublic(buffer, extras) {
   var jwk = {
     kty: 'RSA',
     n: bn2base64url(key.n),
-    e: base64url(e, 'hex')
+    e: hex2b64url(e)
   }
   return addExtras(jwk, extras)
 }
@@ -104,7 +113,7 @@ function decodeRsaPrivate(buffer, extras) {
   var jwk = {
     kty: 'RSA',
     n: bn2base64url(key.n),
-    e: base64url(e, 'hex'),
+    e: hex2b64url(e),
     d: bn2base64url(key.d),
     p: bn2base64url(key.p),
     q: bn2base64url(key.q),
@@ -203,11 +212,11 @@ function jwk2pem(json) {
 }
 
 function bn2base64url(bn) {
-  return base64url(pad(bn.toString(16)), 'hex')
+  return hex2b64url(pad(bn.toString(16)))
 }
 
 function base64url2bn(str) {
-  return new asn.bignum(base64url.toBuffer(str))
+  return new asn.bignum(Buffer(str, 'base64'))
 }
 
 function string2bn(str) {
