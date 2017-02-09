@@ -7,7 +7,7 @@
   "scripts": {
     "test": "tap test"
   },
-  "license": "MPL 2.0",
+  "license": "MPL-2.0",
   "dependencies": {
     "asn1.js": "1.0.3"
   },
