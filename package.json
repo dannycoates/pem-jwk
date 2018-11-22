@@ -9,7 +9,7 @@
   },
   "license": "MPL-2.0",
   "dependencies": {
-    "asn1.js": "1.0.3"
+    "asn1.js": "^5.0.1"
   },
   "devDependencies": {
     "tap": "0.7.1"
