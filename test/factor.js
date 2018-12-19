@@ -1,4 +1,4 @@
-var assert = require('assert')
+var assert = require('tap')
 var factor = require('../factor')
 var BN = require('asn1.js').bignum
 

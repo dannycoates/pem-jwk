@@ -9,7 +9,7 @@ function urlize(base64) {
 }
 
 function hex2b64url(str) {
-  return urlize(Buffer(str, 'hex').toString('base64'))
+  return urlize(Buffer.from(str, 'hex').toString('base64'))
 }
 
 function fromPEM(data) {
@@ -18,7 +18,7 @@ function fromPEM(data) {
     return line.trim().length !== 0;
   });
   text = text.slice(1, -1).join('');
-  return new Buffer(text.replace(/[^\w\d\+\/=]+/g, ''), 'base64');
+  return Buffer.from(text.replace(/[^\w\d\+\/=]+/g, ''), 'base64');
 }
 
 var RSAPublicKey = asn.define('RSAPublicKey', function () {
@@ -155,7 +155,7 @@ function pem2jwk(pem, extras) {
   var decoder = getDecoder(text[0])
 
   text = text.slice(1, -1).join('')
-  return decoder(new Buffer(text.replace(/[^\w\d\+\/=]+/g, ''), 'base64'), extras)
+  return decoder(Buffer.from(text.replace(/[^\w\d\+\/=]+/g, ''), 'base64'), extras)
 }
 
 function recomputePrimes(jwk) {
@@ -196,7 +196,7 @@ function jwk2pem(json) {
   var t = isPrivate ? 'PRIVATE' : 'PUBLIC'
   var header = '-----BEGIN RSA ' + t + ' KEY-----\n'
   var footer = '\n-----END RSA ' + t + ' KEY-----\n'
-  var data = Buffer(0)
+  var data = null
   if (isPrivate) {
     if (!jwk.p) {
       jwk = recomputePrimes(jwk)
@@ -216,7 +216,7 @@ function bn2base64url(bn) {
 }
 
 function base64url2bn(str) {
-  return new asn.bignum(Buffer(str, 'base64'))
+  return new asn.bignum(Buffer.from(str, 'base64'))
 }
 
 function string2bn(str) {
