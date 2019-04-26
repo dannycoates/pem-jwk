@@ -12,7 +12,8 @@
   },
   "license": "MPL-2.0",
   "dependencies": {
-    "asn1.js": "^5.0.1"
+    "asn1.js": "^5.0.1",
+    "safe-buffer": "^5.1.2"
   },
   "devDependencies": {
     "tap": "^12.1.1"

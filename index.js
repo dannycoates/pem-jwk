@@ -1,3 +1,4 @@
+var Buffer = require('safe-buffer').Buffer;
 var asn = require('asn1.js')
 var factor = require('./factor')
 var one = new asn.bignum(1)
